@@ -1,0 +1,50 @@
+\
+\
+----------------------
+Title: "Project 1"
+Author: Alfredo Rios
+----------------------
+\
+\
+First load and get some general statistics
+\
+\
+```{R echo=TRUE}
+setwd("/Users/arios/Documents/coursera/ReprodRes")
+dat=read.csv("activity.csv")
+summary(dat)
+```
+\
+\
+Then estimate total number of steps 
+\
+\
+
+```{R echo=TRUE}
+table_steps=tapply(dat$steps,dat$date,sum,na.rm=T)
+hist(table_steps,breaks=20)
+
+```
+\
+\
+
+```{R echo=TRUE}
+sum(dat$steps,na.rm=T)
+```
+\
+and the mean number of steps
+\
+```{R echo=TRUE}
+mean(dat$steps,na.rm=T)
+```
+\
+and median
+\
+```{R echo=TRUE}
+median(dat$steps,na.rm=T)
+```
+
+```{R echo=TRUE}
+plot(dat$steps~dat$interval,type="l")
+```
+
