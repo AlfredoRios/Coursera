@@ -1,50 +1,86 @@
+
+<h1>Peer Assessment 1<br/></h1>
+
+
+<h2><tab>Introduction</h2> 
 \
-\
-----------------------
-Title: "Project 1"
-Author: Alfredo Rios
-----------------------
-\
-\
-First load and get some general statistics
+
+This assignment's objective is do some general data analysis
+and to then create a tidy dataset. First we will load the data and get some summary statistics for the variables in the dataframe.
 \
 \
 ```{R echo=TRUE}
-setwd("/Users/arios/Documents/coursera/ReprodRes")
+setwd("/Users/arios/GitHub/Coursera/")
 dat=read.csv("activity.csv")
 summary(dat)
 ```
 \
+Then we will estimate total number of steps per day display them and thereafter creat a display of them in the form of a histogram.
 \
-Then estimate total number of steps 
 \
-\
-
 ```{R echo=TRUE}
 table_steps=tapply(dat$steps,dat$date,sum,na.rm=T)
-hist(table_steps,breaks=20)
-
+total=table_steps
+total
 ```
-\
-\
-
 ```{R echo=TRUE}
-sum(dat$steps,na.rm=T)
+hist(table_steps,breaks=20,col="grey",xlab="Total steps",main="Total steps per day")
 ```
 \
-and the mean number of steps
+\
+Now we will estimate the mean number of steps per day:
 \
 ```{R echo=TRUE}
-mean(dat$steps,na.rm=T)
+mean_steps=mean(total,na.rm=T)
+mean_steps
 ```
+The mean number of steps is: ```r round(mean_steps,2)```
 \
-and median
 \
-```{R echo=TRUE}
-median(dat$steps,na.rm=T)
-```
+\
+Now it is time to estimate the median number of steps per day:
 
 ```{R echo=TRUE}
-plot(dat$steps~dat$interval,type="l")
+median_steps=median(total)
+median_steps
+```
+Hence the median total number of steps per day is ```r median_steps```.
+\
+\
+\
+Now we will plot the mean number of steps per time interval:
+```{R echo=TRUE}
+mean_steps_int=tapply(dat$steps,dat$interval,mean,na.rm=T)
+plot(mean_steps_int~seq(1:288),type="l",xlab="Time interval",ylab="Mean number of steps")
+```
+\
+\
+Now is a good time to create a tidy dataset. For this purpose we will impute the **Non Available values (NA)** for a particular interval with its mean interval value among days. 
+\
+```{R echo=TRUE}
+na_step_index=which(is.na(dat$steps)) ## getting the indexes for the missing values
+datsteps2=dat$step
+for(n in na_step_index){
+datsteps2[n]=mean_steps_int[as.character(dat$int[n])]
+}
+newdataset=data.frame(steps=datsteps2,date=dat$date,interval=dat$interval)
+```
+\
+Now we will create a histogram of the total number of steps
+per day and compare it to the previously created one. 
+\
+```{R echo=TRUE}
+table_steps_new=tapply(newdataset$steps,dat$date,sum,na.rm=T)
+hist(table_steps_new,breaks=20,col="grey",xlab="Total steps",main="Total steps per day")
+total_n=table_steps_new
+```
+\
+\
+Now we will estimate the mean and median for the imputed dataset.
+```{R echo=TRUE}
+mean(total_n)
+median(total_n)
 ```
 
+The histograms looks different, seems more symetric. Also the
+median and mean are the same.  
