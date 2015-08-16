@@ -42,7 +42,6 @@ mean_steps
 The mean number of steps is: ```r round(mean_steps,2)```
 <br/>
 <br/>
-<br/>
 Now it is time to estimate the median number of steps per day:
 
 ```{R echo=TRUE}
@@ -52,36 +51,45 @@ median_steps
 Hence the median total number of steps per day is ```r median_steps```.
 <br/>
 <br/>
-<br/>
 Now we will plot the mean number of steps per time interval:
 ```{R echo=TRUE}
 mean_steps_int=tapply(dat$steps,dat$interval,mean,na.rm=T)
 maxstepsint=max(mean_steps_int)
+interval_max=which.max(mean_steps_int)
 plot(mean_steps_int~seq(1:288),type="l",xlab="Time interval",ylab="Mean number of steps")
 ```
+<br/>
 
-Hence the maximum step interval is: ```r maxstepsint```.
+The maximum step interval is: ```r maxstepsint``` in the interval ```r interval_max```.
+
 <br/>
 <br/>
 Now is a good time to create a tidy dataset. For this purpose we will impute the **Non Available values (NA)** for a particular interval with its mean interval value among days. 
 <br/>
+<br/>
 ```{R echo=TRUE}
 na_step_index=which(is.na(dat$steps)) ## getting the indexes for the missing values
+length_na=length(na_step_index)
 datsteps2=dat$step
 for(n in na_step_index){
 datsteps2[n]=mean_steps_int[as.character(dat$int[n])]
 }
 newdataset=data.frame(steps=datsteps2,date=dat$date,interval=dat$interval)
 ```
+The number of NA's is: ```r length_na``` 
+
 <br/>
 Now we will create a histogram of the total number of steps
-per day and compare it to the previously created one. 
+per day with the imputed dataset and compare it to the previously created one. 
 <br/>
 ```{R echo=TRUE}
 table_steps_new=tapply(newdataset$steps,dat$date,sum,na.rm=T)
-hist(table_steps_new,breaks=20,col="grey",xlab="Total steps",main="Total steps per day")
 total_n=table_steps_new
+hist(table_steps_new,breaks=20,col="grey",xlab="Total steps",main="Total steps per day")
 ```
+<br/>
+The histograms looks different, the one with the imputed values seems more symetric.   
+
 <br/>
 <br/>
 Now we will estimate the mean and median for the imputed dataset.
@@ -89,10 +97,13 @@ Now we will estimate the mean and median for the imputed dataset.
 mean(total_n)
 median(total_n)
 ```
-
-The histograms looks different, seems more symetric. Also the
-median and mean are the same.  
-
+<br/>
+Also the median and mean for this histogram are the same.
+<br/>
+<br/>
+Now we will graph the mean number of steps per time interval for weekdays
+and weekends. 
+<br/>
 ```{R echo=TRUE}
 ### The Week variable identifies day as a "Weekday" or "Weekend"
 Week=ifelse(weekdays(as.POSIXct(newdataset$date))%in%c("Saturday","Sunday"),"Weekend","Weekday")
@@ -106,5 +117,10 @@ data.frame(steps=mean_steps_int_Weekday,week=rep("Weekday",nrow(mean_steps_int_W
 finaldata=arrange(finaldata,week,int)
 xyplot(steps~int|week,data=finaldata,type="l",col=1)
 ```
+<br/>
+<br/>
+finally we will create the imputed dataset
 
-
+```{R echo=TRUE}
+write.csv(newdataset2,file="ImputedActivityDataSet",quote=FALSE,row.names=FALSE)
+```
